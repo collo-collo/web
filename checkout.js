@@ -1,7 +1,17 @@
-const stripe = Stripe("pk_test_51S2YySJtu0B3IHCZaokdVaHLKqwRletvuUMRYZnZXiBkG4pXpJm9LLxuu4Oy1NduVg0m7TU4IEdhAMbx01dcqh5G002rOxC2RD"); // get from Stripe Dashboard
+let stripe;
+
+async function initStripe() {
+  // Fetch publishable key from backend
+  const response = await fetch("/api/config");
+  const { publishableKey } = await response.json();
+
+  stripe = Stripe(publishableKey);
+}
 
 document.getElementById("checkout-button").addEventListener("click", async () => {
-  // Call your backend function
+  if (!stripe) await initStripe();
+
+  // Call your backend to create a checkout session
   const response = await fetch("/api/checkout", { method: "POST" });
   const session = await response.json();
 
